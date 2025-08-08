@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  # 算法洞察平台主服务
+  algoinsight:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - ENVIRONMENT=production
+      - PORT=8080
+      - MAX_EXECUTION_TIME=30
+      - MAX_DATA_SIZE=10000
+      - BENCHMARK_TIMEOUT=60
+      - MAX_CONCURRENT_TESTS=5
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # 开发环境 - 后端服务
+  backend-dev:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8080:8080"
+    environment:
+      - ENVIRONMENT=development
+      - PORT=8080
+    volumes:
+      - ./server:/app
+      - /app/vendor
+    working_dir: /app
+    command: go run main.go
+    profiles:
+      - dev
+
+  # 开发环境 - 前端服务
+  frontend-dev:
+    build:
+      context: ./web
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8080/api
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+    working_dir: /app
+    command: pnpm dev --host
+    profiles:
+      - dev
+
+  # Nginx 反向代理 (可选)
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - algoinsight
+    restart: unless-stopped
+    profiles:
+      - production
+
+volumes:
+  logs:
+  data:
+
+networks:
+  default:
+    name: algoinsight-network
