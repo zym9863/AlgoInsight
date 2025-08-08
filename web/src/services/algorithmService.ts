@@ -53,7 +53,9 @@ class AlgorithmCache {
   // 获取缓存的所有算法
   getCachedAllAlgorithms(): Algorithm[] | null {
     const algorithms = this.cache.get('all');
-    const timestamp = this.cache.get('all_timestamp')?.[0] as number;
+    // 修复类型转换问题，确保 timestamp 是 number 类型
+    const timestampArr = this.cache.get('all_timestamp') as number[] | undefined;
+    const timestamp = timestampArr ? timestampArr[0] : undefined;
     
     if (algorithms && timestamp && !this.isExpired(timestamp)) {
       return algorithms;
@@ -71,7 +73,9 @@ class AlgorithmCache {
   // 获取缓存的分类算法
   getCachedCategoryAlgorithms(category: string): Algorithm[] | null {
     const algorithms = this.cache.get(`category_${category}`);
-    const timestamp = this.cache.get(`category_${category}_timestamp`)?.[0] as number;
+    // 修复类型转换问题，确保 timestamp 是 number 类型
+    const timestampArr = this.cache.get(`category_${category}_timestamp`) as number[] | undefined;
+    const timestamp = timestampArr ? timestampArr[0] : undefined;
     
     if (algorithms && timestamp && !this.isExpired(timestamp)) {
       return algorithms;

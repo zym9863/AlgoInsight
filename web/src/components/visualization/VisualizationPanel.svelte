@@ -172,27 +172,27 @@
           <div class="stats-grid">
             <div class="stat-item">
               <span class="stat-label">执行时间:</span>
-              <span class="stat-value">{getExecutionStats().executionTime}</span>
+              <span class="stat-value">{getExecutionStats()?.executionTime}</span>
             </div>
             <div class="stat-item">
               <span class="stat-label">内存使用:</span>
-              <span class="stat-value">{getExecutionStats().memoryUsage}</span>
+              <span class="stat-value">{getExecutionStats()?.memoryUsage}</span>
             </div>
             <div class="stat-item">
               <span class="stat-label">总步骤:</span>
-              <span class="stat-value">{getExecutionStats().totalSteps}</span>
+              <span class="stat-value">{getExecutionStats()?.totalSteps}</span>
             </div>
             <div class="stat-item">
               <span class="stat-label">比较次数:</span>
-              <span class="stat-value">{getExecutionStats().comparisons}</span>
+              <span class="stat-value">{getExecutionStats()?.comparisons}</span>
             </div>
             <div class="stat-item">
               <span class="stat-label">交换次数:</span>
-              <span class="stat-value">{getExecutionStats().swaps}</span>
+              <span class="stat-value">{getExecutionStats()?.swaps}</span>
             </div>
             <div class="stat-item">
               <span class="stat-label">移动次数:</span>
-              <span class="stat-value">{getExecutionStats().moves}</span>
+              <span class="stat-value">{getExecutionStats()?.moves}</span>
             </div>
           </div>
         </div>

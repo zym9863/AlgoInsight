@@ -151,7 +151,7 @@
           <div class="algorithm-header">
             <h4 class="algorithm-name">{algorithm.name}</h4>
             <div class="algorithm-category">
-              {CATEGORY_NAMES[algorithm.category]}
+              {CATEGORY_NAMES[algorithm.category as AlgorithmCategoryType]}
             </div>
           </div>
           
