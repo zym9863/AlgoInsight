@@ -311,9 +311,11 @@
     flex-direction: column;
     gap: 1rem;
     padding: 1rem;
-    background: #f8fafc;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-light);
     border-radius: 8px;
     min-height: 600px;
+    color: var(--color-text-primary);
   }
 
   .panel-header {
@@ -321,12 +323,12 @@
     justify-content: space-between;
     align-items: center;
     padding-bottom: 1rem;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--color-border);
   }
 
   .panel-header h3 {
     margin: 0;
-    color: #1f2937;
+    color: var(--color-text-primary);
   }
 
   .header-actions {
@@ -336,22 +338,24 @@
 
   .action-btn {
     padding: 0.5rem 1rem;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--color-border);
     border-radius: 6px;
-    background: white;
-    color: #374151;
+    background: var(--color-surface-elevated);
+    color: var(--color-text-primary);
     font-size: 0.875rem;
     cursor: pointer;
     transition: all 0.2s;
   }
 
   .action-btn:hover {
-    background: #f3f4f6;
+    background: var(--color-primary-50);
+    border-color: var(--color-primary-300);
+    color: var(--color-primary-700);
   }
 
   .action-btn.secondary {
-    color: #dc2626;
-    border-color: #fecaca;
+    color: var(--color-error-500);
+    border-color: var(--color-error-50);
   }
 
   .benchmark-content {
@@ -362,16 +366,17 @@
 
   .config-panel,
   .results-panel {
-    background: white;
+    background: var(--color-surface-elevated);
     padding: 1.5rem;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-border-light);
   }
 
   .config-panel h4,
   .results-panel h4 {
     margin: 0 0 1rem 0;
-    color: #1f2937;
+    color: var(--color-text-primary);
   }
 
   .config-section {
@@ -381,7 +386,7 @@
   .config-section label {
     display: block;
     margin-bottom: 0.5rem;
-    color: #374151;
+    color: var(--color-text-primary);
     font-weight: 500;
   }
 
@@ -396,13 +401,15 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem;
-    background: #f9fafb;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-light);
     border-radius: 4px;
     cursor: pointer;
   }
 
   .algorithm-checkbox:hover {
-    background: #f3f4f6;
+    background: var(--color-primary-50);
+    border-color: var(--color-primary-300);
   }
 
   .data-sizes {
@@ -416,15 +423,16 @@
     align-items: center;
     gap: 0.25rem;
     padding: 0.25rem 0.5rem;
-    background: #e5e7eb;
+    background: var(--color-border-light);
     border-radius: 4px;
     font-size: 0.875rem;
+    color: var(--color-text-primary);
   }
 
   .remove-btn {
     background: none;
     border: none;
-    color: #dc2626;
+    color: var(--color-error-500);
     cursor: pointer;
     font-size: 1rem;
     line-height: 1;
@@ -432,7 +440,7 @@
 
   .add-btn {
     padding: 0.25rem 0.5rem;
-    background: #3b82f6;
+    background: var(--color-primary-500);
     color: white;
     border: none;
     border-radius: 4px;
@@ -443,7 +451,7 @@
   .run-btn {
     width: 100%;
     padding: 0.75rem;
-    background: #10b981;
+    background: var(--color-success-500);
     color: white;
     border: none;
     border-radius: 6px;
@@ -454,12 +462,12 @@
   }
 
   .run-btn:hover:not(:disabled) {
-    background: #059669;
+    background: var(--color-success-600);
   }
 
   .run-btn:disabled {
-    background: #d1d5db;
-    color: #9ca3af;
+    background: var(--color-border);
+    color: var(--color-text-muted);
     cursor: not-allowed;
   }
 
@@ -468,13 +476,14 @@
     flex-direction: column;
     align-items: center;
     padding: 3rem;
+    color: var(--color-text-secondary);
   }
 
   .loading-spinner {
     width: 40px;
     height: 40px;
-    border: 4px solid #f3f4f6;
-    border-top: 4px solid #3b82f6;
+    border: 4px solid var(--color-border-light);
+    border-top: 4px solid var(--color-primary-500);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 1rem;
@@ -488,7 +497,7 @@
   .empty-results {
     text-align: center;
     padding: 3rem;
-    color: #6b7280;
+    color: var(--color-text-muted);
   }
 
   .results-table {

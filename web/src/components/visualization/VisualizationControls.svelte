@@ -211,9 +211,11 @@
     flex-direction: column;
     gap: 1rem;
     padding: 1rem;
-    background: white;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-light);
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm);
+    color: var(--color-text-primary);
   }
 
   .visualization-controls.compact {
@@ -233,28 +235,32 @@
     align-items: center;
     gap: 0.25rem;
     padding: 0.5rem 1rem;
-    background: #f3f4f6;
-    border: 1px solid #d1d5db;
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border);
     border-radius: 6px;
     font-size: 0.875rem;
+    color: var(--color-text-primary);
     cursor: pointer;
     transition: all 0.2s;
   }
 
   .control-btn:hover:not(:disabled) {
-    background: #e5e7eb;
-    border-color: #9ca3af;
+    background: var(--color-primary-50);
+    border-color: var(--color-primary-300);
+    color: var(--color-primary-700);
   }
 
   .control-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    color: var(--color-text-muted);
   }
 
   .play-btn.playing {
-    background: #fef3c7;
-    border-color: #f59e0b;
-    color: #92400e;
+    background: var(--color-warning-50);
+    border-color: var(--color-warning-500);
+    color: var(--color-warning-500);
+    font-weight: 500;
   }
 
   .step-controls {
@@ -273,6 +279,8 @@
 
   .text {
     font-size: 0.875rem;
+    font-weight: 500;
+    color: inherit;
   }
 
   .progress-section {
@@ -283,7 +291,7 @@
     position: relative;
     width: 100%;
     height: 8px;
-    background: #e5e7eb;
+    background: var(--color-border-light);
     border-radius: 4px;
     cursor: pointer;
     overflow: hidden;
@@ -291,7 +299,7 @@
 
   .progress-fill {
     height: 100%;
-    background: #3b82f6;
+    background: var(--color-primary-500);
     border-radius: 4px;
     transition: width 0.2s ease;
   }
@@ -301,11 +309,11 @@
     top: -4px;
     width: 16px;
     height: 16px;
-    background: #3b82f6;
-    border: 2px solid white;
+    background: var(--color-primary-500);
+    border: 2px solid var(--color-surface);
     border-radius: 50%;
     transform: translateX(-50%);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow-md);
     transition: left 0.2s ease;
   }
 
@@ -315,12 +323,12 @@
     align-items: center;
     gap: 0.5rem;
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--color-text-secondary);
   }
 
   .step-text {
     font-weight: 500;
-    color: #374151;
+    color: var(--color-text-primary);
   }
 
   .speed-control {
@@ -331,8 +339,9 @@
   }
 
   .speed-control label {
-    color: #374151;
+    color: var(--color-text-primary);
     white-space: nowrap;
+    font-weight: 500;
   }
 
   .speed-control input[type="range"] {
@@ -341,9 +350,10 @@
   }
 
   .speed-value {
-    color: #6b7280;
+    color: var(--color-text-secondary);
     min-width: 50px;
     text-align: right;
+    font-weight: 500;
   }
 
   @media (max-width: 640px) {
@@ -359,6 +369,25 @@
       flex-direction: column;
       align-items: stretch;
       gap: 0.25rem;
+    }
+  }
+
+  /* 深色模式特殊优化 */
+  @media (prefers-color-scheme: dark) {
+    .control-btn:hover:not(:disabled) {
+      background: var(--color-primary-800);
+      border-color: var(--color-primary-600);
+      color: var(--color-primary-100);
+    }
+
+    .play-btn.playing {
+      background: var(--color-warning-800);
+      border-color: var(--color-warning-600);
+      color: var(--color-warning-200);
+    }
+
+    .icon {
+      filter: brightness(1.2);
     }
   }
 </style>
