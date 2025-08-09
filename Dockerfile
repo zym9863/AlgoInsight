@@ -21,7 +21,7 @@ COPY web/ ./
 RUN pnpm build
 
 # 阶段2: 构建后端
-FROM golang:1.21-alpine AS backend-builder
+FROM golang:1.23-alpine AS backend-builder
 
 # 安装必要的包
 RUN apk add --no-cache git
