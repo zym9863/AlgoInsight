@@ -1,0 +1,23 @@
+# Git
+.git
+.gitignore
+
+# Node
+**/node_modules
+**/dist
+**/build
+.npm
+npm-debug.log*
+yarn-error.log
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+# IDE
+.idea
+.vscode
+
+# OS
+.DS_Store
+Thumbs.db
