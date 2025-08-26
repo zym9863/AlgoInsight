@@ -2,6 +2,7 @@ package services
 
 import (
 	"gin/algorithms"
+	"gin/algorithms/graph"
 	"gin/algorithms/searching"
 	"gin/algorithms/sorting"
 	"gin/models"
@@ -29,9 +30,17 @@ func (s *AlgorithmService) registerAlgorithms() {
 	// 注册排序算法
 	s.registry.Register(sorting.NewBubbleSort())
 	s.registry.Register(sorting.NewQuickSort())
+	s.registry.Register(sorting.NewMergeSort())
+	s.registry.Register(sorting.NewInsertionSort())
+	s.registry.Register(sorting.NewHeapSort())
 	
 	// 注册搜索算法
 	s.registry.Register(searching.NewBinarySearch())
+	s.registry.Register(searching.NewLinearSearch())
+	
+	// 注册图算法
+	s.registry.Register(graph.NewBFS())
+	s.registry.Register(graph.NewDFS())
 	
 	// 可以继续注册更多算法...
 }
