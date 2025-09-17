@@ -17,10 +17,10 @@ func NewAlgorithmService() *AlgorithmService {
 	service := &AlgorithmService{
 		registry: algorithms.NewAlgorithmRegistry(),
 	}
-	
+
 	// 注册算法
 	service.registerAlgorithms()
-	
+
 	return service
 }
 
@@ -29,10 +29,17 @@ func (s *AlgorithmService) registerAlgorithms() {
 	// 注册排序算法
 	s.registry.Register(sorting.NewBubbleSort())
 	s.registry.Register(sorting.NewQuickSort())
-	
+	s.registry.Register(sorting.NewMergeSort())
+	s.registry.Register(sorting.NewHeapSort())
+	s.registry.Register(sorting.NewInsertionSort())
+	s.registry.Register(sorting.NewSelectionSort())
+	s.registry.Register(sorting.NewShellSort())
+
 	// 注册搜索算法
 	s.registry.Register(searching.NewBinarySearch())
-	
+	s.registry.Register(searching.NewLinearSearch())
+	s.registry.Register(searching.NewHashSearch())
+
 	// 可以继续注册更多算法...
 }
 
@@ -40,11 +47,11 @@ func (s *AlgorithmService) registerAlgorithms() {
 func (s *AlgorithmService) GetAllAlgorithms() ([]*models.Algorithm, error) {
 	algorithms := s.registry.GetAll()
 	result := make([]*models.Algorithm, len(algorithms))
-	
+
 	for i, algorithm := range algorithms {
 		result[i] = algorithm.GetInfo()
 	}
-	
+
 	return result, nil
 }
 
@@ -52,11 +59,11 @@ func (s *AlgorithmService) GetAllAlgorithms() ([]*models.Algorithm, error) {
 func (s *AlgorithmService) GetAlgorithmsByCategory(category string) ([]*models.Algorithm, error) {
 	algorithms := s.registry.GetByCategory(category)
 	result := make([]*models.Algorithm, len(algorithms))
-	
+
 	for i, algorithm := range algorithms {
 		result[i] = algorithm.GetInfo()
 	}
-	
+
 	return result, nil
 }
 
@@ -66,7 +73,7 @@ func (s *AlgorithmService) GetAlgorithmInfo(algorithmID string) (*models.Algorit
 	if !exists {
 		return nil, ErrAlgorithmNotFound
 	}
-	
+
 	return algorithm.GetInfo(), nil
 }
 
@@ -76,7 +83,7 @@ func (s *AlgorithmService) GetAlgorithm(algorithmID string) (algorithms.Algorith
 	if !exists {
 		return nil, ErrAlgorithmNotFound
 	}
-	
+
 	return algorithm, nil
 }
 

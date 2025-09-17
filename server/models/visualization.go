@@ -6,26 +6,26 @@ import (
 
 // VisualizationSession 可视化会话
 type VisualizationSession struct {
-	ID          string                `json:"id"`          // 会话ID
-	AlgorithmID string                `json:"algorithmId"` // 算法ID
-	InputData   interface{}           `json:"inputData"`   // 输入数据
-	Parameters  interface{}           `json:"parameters"`  // 算法参数
-	Steps       []VisualizationStep   `json:"steps"`       // 执行步骤
-	Status      string                `json:"status"`      // 会话状态 (running, completed, error)
-	CreatedAt   time.Time             `json:"createdAt"`   // 创建时间
-	CompletedAt *time.Time            `json:"completedAt"` // 完成时间
-	Error       string                `json:"error,omitempty"` // 错误信息
+	ID          string              `json:"id"`              // 会话ID
+	AlgorithmID string              `json:"algorithmId"`     // 算法ID
+	InputData   interface{}         `json:"inputData"`       // 输入数据
+	Parameters  interface{}         `json:"parameters"`      // 算法参数
+	Steps       []VisualizationStep `json:"steps"`           // 执行步骤
+	Status      string              `json:"status"`          // 会话状态 (running, completed, error)
+	CreatedAt   time.Time           `json:"createdAt"`       // 创建时间
+	CompletedAt *time.Time          `json:"completedAt"`     // 完成时间
+	Error       string              `json:"error,omitempty"` // 错误信息
 }
 
 // VisualizationStep 可视化步骤
 type VisualizationStep struct {
-	StepID      int           `json:"stepId"`      // 步骤ID
-	Description string        `json:"description"` // 步骤描述
-	Data        interface{}   `json:"data"`        // 当前数据状态
-	Highlights  []int         `json:"highlights"`  // 高亮元素索引
-	Comparisons []Comparison  `json:"comparisons"` // 比较操作
-	Operations  []Operation   `json:"operations"`  // 执行的操作
-	Metadata    StepMetadata  `json:"metadata"`    // 步骤元数据
+	StepID      int          `json:"stepId"`      // 步骤ID
+	Description string       `json:"description"` // 步骤描述
+	Data        interface{}  `json:"data"`        // 当前数据状态
+	Highlights  []int        `json:"highlights"`  // 高亮元素索引
+	Comparisons []Comparison `json:"comparisons"` // 比较操作
+	Operations  []Operation  `json:"operations"`  // 执行的操作
+	Metadata    StepMetadata `json:"metadata"`    // 步骤元数据
 }
 
 // Comparison 比较操作
@@ -38,10 +38,10 @@ type Comparison struct {
 
 // Operation 操作
 type Operation struct {
-	Type        string      `json:"type"`        // 操作类型 (swap, move, insert, delete, etc.)
-	Indices     []int       `json:"indices"`     // 涉及的索引
-	Values      []interface{} `json:"values"`    // 涉及的值
-	Description string      `json:"description"` // 操作描述
+	Type        string        `json:"type"`        // 操作类型 (swap, move, insert, delete, etc.)
+	Indices     []int         `json:"indices"`     // 涉及的索引
+	Values      []interface{} `json:"values"`      // 涉及的值
+	Description string        `json:"description"` // 操作描述
 }
 
 // StepMetadata 步骤元数据
@@ -84,16 +84,18 @@ const (
 
 // OperationType 操作类型常量
 const (
-	OpTypeSwap     = "swap"
-	OpTypeMove     = "move"
-	OpTypeInsert   = "insert"
-	OpTypeDelete   = "delete"
-	OpTypeCompare  = "compare"
-	OpTypeAccess   = "access"
-	OpTypeUpdate   = "update"
-	OpTypeMerge    = "merge"
-	OpTypeSplit    = "split"
+	OpTypeSwap      = "swap"
+	OpTypeMove      = "move"
+	OpTypeInsert    = "insert"
+	OpTypeDelete    = "delete"
+	OpTypeCompare   = "compare"
+	OpTypeAccess    = "access"
+	OpTypeUpdate    = "update"
+	OpTypeMerge     = "merge"
+	OpTypeSplit     = "split"
 	OpTypePartition = "partition"
+	OpTypeAssign    = "assign" // 赋值操作
+	OpTypeCall      = "call"   // 函数调用操作
 )
 
 // StepTracker 步骤追踪器接口
@@ -109,8 +111,8 @@ type StepTracker interface {
 
 // DefaultStepTracker 默认步骤追踪器实现
 type DefaultStepTracker struct {
-	steps []VisualizationStep
-	stats ExecutionStats
+	steps        []VisualizationStep
+	stats        ExecutionStats
 	currentPhase string
 }
 
@@ -165,7 +167,7 @@ func (t *DefaultStepTracker) AddOperation(opType string, indices []int, values [
 		}
 		lastStep := &t.steps[len(t.steps)-1]
 		lastStep.Operations = append(lastStep.Operations, operation)
-		
+
 		// 更新统计
 		switch opType {
 		case OpTypeSwap:
