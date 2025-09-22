@@ -2,7 +2,18 @@
 
 **语言**: **中文** | [English](README-EN.md)
 
-一个交互式算法学习和性能分析工具，支持算法可视化和性能对比功能。
+<p align="left">
+    <a href="https://github.com/zym9863/AlgoInsight/actions" target="_blank"><img alt="CI" src="https://img.shields.io/badge/CI-pending-lightgrey" /></a>
+    <a href="LICENSE" target="_blank"><img alt="License" src="https://img.shields.io/badge/License-MIT-blue.svg" /></a>
+    <img alt="Go Version" src="https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go" />
+    <img alt="Svelte" src="https://img.shields.io/badge/Svelte-5-orange?logo=svelte" />
+    <img alt="Docker" src="https://img.shields.io/badge/Docker-ready-2496ED?logo=docker" />
+    <img alt="Status" src="https://img.shields.io/badge/status-active-success" />
+</p>
+
+一个面向学习与教学的**交互式算法可视化与性能分析平台**。通过统一的接口与步进追踪机制（Step Tracker），可在前端实时呈现排序 / 搜索 / 图等算法的执行过程，并支持多算法基准测试、数据生成、性能指标对比与结果可视化。
+
+> 设计目标：降低算法学习的“抽象门槛”，用结构化数据 + 可视化动画，帮助理解时间/空间复杂度及不同算法策略差异。
 
 ## 🚀 功能特性
 
@@ -19,6 +30,21 @@
 - **性能指标**: 执行时间、内存使用、操作次数统计
 - **对比分析**: 图表化展示性能差异
 - **详细报告**: 生成完整的性能分析报告
+
+### 功能三：数据集生成与管理
+- **多模式**: 随机、近乎有序、逆序、重复值、特定分布
+- **预设数据集**: 内置多种规模与特征的预设数据
+- **统一结构**: 后端统一包装数据与元信息，便于复现实验
+
+### 功能四：统一算法抽象接口
+- 接口定义：`Execute(data, tracker)`
+- 步骤追踪：比较、交换、访问等操作统一编码，前端可重构渲染
+- 易扩展：新增算法只需实现接口并注册元信息
+
+### 功能五：可视化交互控制
+- 支持播放 / 暂停 / 单步 / 快速跳转
+- 调速：实时调整动画速度
+- 高亮：当前操作元素、比较对、已排序区间
 
 ## 🛠️ 技术栈
 
@@ -106,6 +132,8 @@ AlgoInsight/
 
 ## 🔧 API接口
 
+> 更详细的字段说明与扩展示例可参考：`test_api.py`（含调用示例与简单性能测量）。
+
 ### 算法管理
 - `GET /api/algorithms` - 获取所有算法
 - `GET /api/algorithms/category/{category}` - 按类别获取算法
@@ -127,12 +155,16 @@ AlgoInsight/
 
 ## 🎯 支持的算法
 
+> 下列列表基于当前代码库实际实现（`server/algorithms`）。README 早期占位的 Dijkstra / Kruskal 尚未落地，避免误导已临时移除，可在 Roadmap 中查看计划。
+
 ### 排序算法
 - 冒泡排序 (Bubble Sort)
 - 快速排序 (Quick Sort)
 - 归并排序 (Merge Sort)
 - 堆排序 (Heap Sort)
 - 插入排序 (Insertion Sort)
+- 选择排序 (Selection Sort)
+- 希尔排序 (Shell Sort)
 
 ### 搜索算法
 - 线性搜索 (Linear Search)
@@ -142,8 +174,29 @@ AlgoInsight/
 ### 图算法
 - 广度优先搜索 (BFS)
 - 深度优先搜索 (DFS)
-- 最短路径 (Dijkstra)
-- 最小生成树 (Kruskal)
+
+## 🧪 本地 API 快速测试
+
+使用自带脚本：
+
+```bash
+python test_api.py
+```
+
+或手动调用示例（Windows CMD）：
+
+```cmd
+curl -X GET http://localhost:8080/api/algorithms
+curl -X POST http://localhost:8080/api/data/generate -H "Content-Type: application/json" -d "{\"dataType\":\"array\",\"size\":10,\"pattern\":\"random\"}"
+```
+
+典型可视化请求：
+
+```bash
+curl -X POST http://localhost:8080/api/visualize/execute \
+    -H "Content-Type: application/json" \
+    -d '{"algorithmId":"bubble_sort","data":[5,3,8,2],"parameters":{}}'
+```
 
 ## 🚀 部署
 
@@ -175,6 +228,16 @@ docker-compose up -d
 | `BENCHMARK_TIMEOUT` | 60 | 性能测试超时(秒) |
 | `MAX_CONCURRENT_TESTS` | 5 | 最大并发测试数 |
 
+## 🧭 Roadmap
+
+- [ ] 增加图算法：Dijkstra、Kruskal、Prim、Topological Sort
+- [ ] 增加更多性能指标：内存峰值、GC 次数
+- [ ] 前端：步骤滑块快速跳转 / 断点标记
+- [ ] 算法步骤导出（JSON / GIF / 视频）
+- [ ] 国际化 (i18n) 自动切换
+- [ ] Online Playground Demo 部署
+- [ ] CI：单元测试 + 构建发布流水线
+
 ## 🤝 贡献指南
 
 1. Fork 项目
@@ -186,6 +249,20 @@ docker-compose up -d
 ## 📝 许可证
 
 本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+
+## ❓ FAQ
+
+**Q: 为什么某些算法只显示名称没有复杂度?**  
+A: 复杂度信息来自算法元数据，若未填写或算法初版实现尚未补充会为空，欢迎补充 PR。
+
+**Q: 如何新增一个算法?**  
+A: 在 `server/algorithms/<category>/` 下创建文件，实现接口（参考现有排序算法）并在注册逻辑中加入元信息；前端会自动通过 `/api/algorithms` 获取。
+
+**Q: 是否支持自定义数据结构?**  
+A: 当前聚焦数组与基本图结构，后续会在 Roadmap 中扩展。
+
+**Q: Docker 镜像是否可用于生产?**  
+A: 目前镜像为教学/演示优化，生产可自行加反向代理、日志、鉴权。
 
 ## 🙏 致谢
 

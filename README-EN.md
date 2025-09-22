@@ -2,7 +2,18 @@
 
 **Language**: [中文](README.md) | **English**
 
-An interactive algorithm learning and performance analysis tool that supports algorithm visualization and performance comparison.
+<p align="left">
+    <a href="https://github.com/zym9863/AlgoInsight/actions" target="_blank"><img alt="CI" src="https://img.shields.io/badge/CI-pending-lightgrey" /></a>
+    <a href="LICENSE" target="_blank"><img alt="License" src="https://img.shields.io/badge/License-MIT-blue.svg" /></a>
+    <img alt="Go Version" src="https://img.shields.io/badge/Go-1.22+-00ADD8?logo=go" />
+    <img alt="Svelte" src="https://img.shields.io/badge/Svelte-5-orange?logo=svelte" />
+    <img alt="Docker" src="https://img.shields.io/badge/Docker-ready-2496ED?logo=docker" />
+    <img alt="Status" src="https://img.shields.io/badge/status-active-success" />
+</p>
+
+An interactive platform focusing on algorithm learning, visualization and performance analysis. With a unified step-tracking abstraction, it renders execution flow of sorting / searching / graph algorithms in real time, supports multi-algorithm benchmarking, dataset generation, metric comparison and visual reporting.
+
+> Goal: Lower the cognitive barrier of classic algorithms by turning abstract steps into structured trace + visual animation.
 
 ## 🚀 Features
 
@@ -19,6 +30,21 @@ An interactive algorithm learning and performance analysis tool that supports al
 - **Performance Metrics**: Execution time, memory usage, operation count statistics
 - **Comparison Analysis**: Chart visualization of performance differences
 - **Detailed Reports**: Generate comprehensive performance analysis reports
+
+### Feature 3: Dataset Generation & Management
+- **Modes**: random, nearly-sorted, reversed, duplicated, custom patterns
+- **Preset datasets**: Bundled multi-size presets for reproducibility
+- **Unified format**: Standard metadata wrapper for experiments
+
+### Feature 4: Unified Algorithm Abstraction
+- Interface: `Execute(data, tracker)`
+- Step tracking: comparisons / swaps / accesses are normalized for consistent rendering
+- Extensibility: Implement interface + register metadata
+
+### Feature 5: Visualization Interaction
+- Play / pause / single-step / jump
+- Speed control (dynamic)
+- Highlight current operation, compare pair, sorted region
 
 ## 🛠️ Technology Stack
 
@@ -107,6 +133,8 @@ AlgoInsight/
 
 ## 🔧 API Endpoints
 
+> For more concrete examples see: `test_api.py` (includes sample calls & simple performance measurements).
+
 ### Algorithm Management
 - `GET /api/algorithms` - Get all algorithms
 - `GET /api/algorithms/category/{category}` - Get algorithms by category
@@ -128,12 +156,16 @@ AlgoInsight/
 
 ## 🎯 Supported Algorithms
 
+> List reflects current implementation in `server/algorithms`. Earlier placeholders (Dijkstra, Kruskal) are not yet implemented and moved to Roadmap to avoid confusion.
+
 ### Sorting Algorithms
 - Bubble Sort
 - Quick Sort
 - Merge Sort
 - Heap Sort
 - Insertion Sort
+- Selection Sort
+- Shell Sort
 
 ### Searching Algorithms
 - Linear Search
@@ -143,8 +175,29 @@ AlgoInsight/
 ### Graph Algorithms
 - Breadth-First Search (BFS)
 - Depth-First Search (DFS)
-- Shortest Path (Dijkstra)
-- Minimum Spanning Tree (Kruskal)
+
+## 🧪 Local API Quick Test
+
+Using bundled script:
+
+```bash
+python test_api.py
+```
+
+Manual calls (Windows CMD):
+
+```cmd
+curl -X GET http://localhost:8080/api/algorithms
+curl -X POST http://localhost:8080/api/data/generate -H "Content-Type: application/json" -d "{\"dataType\":\"array\",\"size\":10,\"pattern\":\"random\"}"
+```
+
+Visualization example:
+
+```bash
+curl -X POST http://localhost:8080/api/visualize/execute \
+    -H "Content-Type: application/json" \
+    -d '{"algorithmId":"bubble_sort","data":[5,3,8,2],"parameters":{}}'
+```
 
 ## 🚀 Deployment
 
@@ -176,6 +229,16 @@ docker-compose up -d
 | `BENCHMARK_TIMEOUT` | 60 | Performance test timeout (seconds) |
 | `MAX_CONCURRENT_TESTS` | 5 | Maximum concurrent tests |
 
+## 🧭 Roadmap
+
+- [ ] Graph algorithms: Dijkstra, Kruskal, Prim, Topological Sort
+- [ ] More metrics: peak memory, GC stats
+- [ ] Frontend: step slider & breakpoint markers
+- [ ] Export steps (JSON / GIF / Video)
+- [ ] i18n auto switch
+- [ ] Public online playground demo
+- [ ] CI: unit tests + build pipeline
+
 ## 🤝 Contributing
 
 1. Fork the project
@@ -187,6 +250,20 @@ docker-compose up -d
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## ❓ FAQ
+
+**Q: Why some algorithms miss complexity info?**  
+A: Metadata not filled yet; contributions welcome.
+
+**Q: How do I add a new algorithm?**  
+A: Create file under `server/algorithms/<category>/`, implement interface (see sorting examples), register metadata; frontend auto fetches via `/api/algorithms`.
+
+**Q: Custom data structures supported?**  
+A: Currently arrays & basic graph structures; extensions planned (see Roadmap).
+
+**Q: Is the Docker image production ready?**  
+A: Geared toward learning/demo; add reverse proxy, logging, auth for production.
 
 ## 🙏 Acknowledgments
 
