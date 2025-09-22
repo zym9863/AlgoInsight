@@ -4,6 +4,7 @@ import (
 	"gin/models"
 	"math/rand"
 	"time"
+	"strconv"
 )
 
 // DataService 数据服务
@@ -151,8 +152,8 @@ func (s *DataService) generateGraphData(size int, pattern string, parameters int
 	// 生成节点
 	for i := 0; i < size; i++ {
 		nodes[i] = models.GraphNode{
-			ID:    "node_" + string(rune(i)),
-			Label: "Node " + string(rune(i)),
+			ID:    "node_" + strconv.Itoa(i),
+			Label: "Node " + strconv.Itoa(i)+"",
 			Value: i,
 			X:     float64(i * 50),
 			Y:     float64(i * 50),
@@ -167,8 +168,8 @@ func (s *DataService) generateGraphData(size int, pattern string, parameters int
 		to := rand.Intn(size)
 		if from != to {
 			edges = append(edges, models.GraphEdge{
-				From:   "node_" + string(rune(from)),
-				To:     "node_" + string(rune(to)),
+				From:   "node_" + strconv.Itoa(from),
+				To:     "node_" + strconv.Itoa(to),
 				Weight: rand.Intn(10) + 1,
 				Label:  "",
 			})
@@ -218,7 +219,7 @@ func (s *DataService) addTreeNodes(parent *models.TreeNode, currentCount int, ma
 	// 添加左子节点
 	if currentCount < maxSize {
 		leftChild := &models.TreeNode{
-			ID:     "node_" + string(rune(currentCount)),
+			ID:     "node_" + strconv.Itoa(currentCount),
 			Value:  currentCount,
 			Parent: parent,
 			X:      parent.X - float64(50/(level+1)),
@@ -235,7 +236,7 @@ func (s *DataService) addTreeNodes(parent *models.TreeNode, currentCount int, ma
 	// 添加右子节点
 	if currentCount < maxSize {
 		rightChild := &models.TreeNode{
-			ID:     "node_" + string(rune(currentCount)),
+			ID:     "node_" + strconv.Itoa(currentCount),
 			Value:  currentCount,
 			Parent: parent,
 			X:      parent.X + float64(50/(level+1)),

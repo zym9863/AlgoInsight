@@ -3,6 +3,7 @@ package sorting
 import (
 	"gin/algorithms"
 	"gin/models"
+	"strconv"
 )
 
 // BubbleSort 冒泡排序算法
@@ -67,7 +68,7 @@ func (bs *BubbleSort) Sort(data []interface{}, tracker models.StepTracker) error
 
 	// 外层循环：控制排序轮数
 	for i := 0; i < n-1; i++ {
-		tracker.SetPhase("第" + string(rune(i+1)) + "轮冒泡")
+		tracker.SetPhase("第" + strconv.Itoa(i+1) + "轮冒泡")
 		swapped := false
 
 		// 内层循环：进行比较和交换
@@ -97,8 +98,8 @@ func (bs *BubbleSort) Sort(data []interface{}, tracker models.StepTracker) error
 		}
 
 		// 一轮结束，最大元素已经"冒泡"到正确位置
-		tracker.AddStep("第"+string(rune(i+1))+"轮结束，最大元素已就位", data, []int{n - i - 1})
-		tracker.AddNote("位置 " + string(rune(n-i-1)) + " 的元素已确定")
+		tracker.AddStep("第"+strconv.Itoa(i+1)+"轮结束，最大元素已就位", data, []int{n - i - 1})
+		tracker.AddNote("位置 " + strconv.Itoa(n-i-1) + " 的元素已确定")
 
 		// 如果这一轮没有发生交换，说明数组已经有序
 		if !swapped {

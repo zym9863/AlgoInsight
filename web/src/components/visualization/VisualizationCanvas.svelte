@@ -66,8 +66,9 @@
     // 根据数据类型绘制
     if (Array.isArray(step.data)) {
       drawArrayVisualization(step);
+    } else if (isGraphData(step.data)) {
+      drawGraphVisualization(step);
     } else if (step.data && typeof step.data === 'object') {
-      // 处理其他数据类型（图、树等）
       drawGenericVisualization(step);
     }
   }
@@ -172,6 +173,63 @@
     ctx.moveTo(x2, y);
     ctx.lineTo(x2 - arrowSize * Math.cos(angle + Math.PI / 6), y - arrowSize * Math.sin(angle + Math.PI / 6));
     ctx.stroke();
+  }
+
+  function isGraphData(data: any): boolean {
+    return data && Array.isArray(data.nodes) && Array.isArray(data.edges);
+  }
+
+  // 绘制图可视化
+  function drawGraphVisualization(step: VisualizationStep) {
+    const data = step.data as any;
+    const nodes = data.nodes as Array<{ id: string; label: string; x?: number; y?: number }>;
+    const edges = data.edges as Array<{ from: string; to: string }>;
+
+    // 计算布局（如果没有坐标，生成圆形布局）
+    const cx = width / 2;
+    const cy = height / 2;
+    const radius = Math.min(width, height) * 0.35;
+
+    const positions: Record<string, { x: number; y: number }> = {};
+    nodes.forEach((n, i) => {
+      const angle = (2 * Math.PI * i) / nodes.length;
+      const x = typeof n.x === 'number' ? n.x : cx + radius * Math.cos(angle);
+      const y = typeof n.y === 'number' ? n.y : cy + radius * Math.sin(angle);
+      positions[n.id] = { x, y };
+    });
+
+    // 清空并绘制边
+    ctx.strokeStyle = $visualizationTheme.borderColor;
+    ctx.lineWidth = 1.5;
+    edges.forEach(e => {
+      const p1 = positions[e.from];
+      const p2 = positions[e.to];
+      if (!p1 || !p2) return;
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.stroke();
+    });
+
+    // 绘制节点
+    nodes.forEach((n, i) => {
+      const pos = positions[n.id];
+      if (!pos) return;
+      const r = 16;
+      const highlighted = step.highlights && step.highlights.includes(i);
+      ctx.fillStyle = highlighted ? $visualizationTheme.highlightColor : $visualizationTheme.primaryColor;
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, r, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.strokeStyle = $visualizationTheme.borderColor;
+      ctx.stroke();
+
+      // 标签
+      ctx.fillStyle = $visualizationTheme.textColor;
+      ctx.font = '12px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(n.label ?? n.id, pos.x, pos.y - r - 4);
+    });
   }
 
   // 绘制通用可视化

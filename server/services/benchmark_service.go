@@ -3,6 +3,7 @@ package services
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"fmt"
 	"gin/models"
 	"sync"
 	"time"
@@ -97,7 +98,7 @@ func (s *BenchmarkService) executeBenchmarkTest(test *models.BenchmarkTest) {
 
 			// 运行多次测试
 			for i := 0; i < test.TestCount; i++ {
-				result := s.runSingleTest(test.ID, algorithm, testData, dataSize, i)
+				result := s.runSingleTest(test.ID, algorithm, testData, test.DataType, dataSize, i)
 
 				s.mutex.Lock()
 				test.Results = append(test.Results, result)
@@ -108,7 +109,7 @@ func (s *BenchmarkService) executeBenchmarkTest(test *models.BenchmarkTest) {
 }
 
 // runSingleTest 运行单次测试
-func (s *BenchmarkService) runSingleTest(testID string, algorithm interface{}, data interface{}, dataSize int, runIndex int) models.BenchmarkResult {
+func (s *BenchmarkService) runSingleTest(testID string, algorithm interface{}, data interface{}, dataType string, dataSize int, runIndex int) models.BenchmarkResult {
 	// 创建步骤追踪器（用于统计）
 	tracker := models.NewStepTracker()
 
@@ -143,7 +144,7 @@ func (s *BenchmarkService) runSingleTest(testID string, algorithm interface{}, d
 		AlgorithmID:   algorithmInfo.ID,
 		AlgorithmName: algorithmInfo.Name,
 		DataSize:      dataSize,
-		DataType:      "array", // 简化处理
+		DataType:      dataType,
 		RunIndex:      runIndex,
 		ExecutionTime: executionTime,
 		Operations:    int64(stats.Comparisons + stats.Swaps + stats.Moves),
@@ -163,12 +164,28 @@ func (s *BenchmarkService) runSingleTest(testID string, algorithm interface{}, d
 
 // generateTestData 生成测试数据
 func (s *BenchmarkService) generateTestData(dataType string, size int) interface{} {
-	// 简化实现，生成随机整数数组
-	data := make([]interface{}, size)
-	for i := 0; i < size; i++ {
-		data[i] = i // 简单的递增序列
+	// 根据数据类型生成简单的数据
+	switch dataType {
+	case models.DataTypeGraph:
+		nodes := make([]models.GraphNode, size)
+		edges := make([]models.GraphEdge, 0)
+		for i := 0; i < size; i++ {
+			id := fmt.Sprintf("node_%d", i)
+			nodes[i] = models.GraphNode{ID: id, Label: id, Value: i}
+			if i > 0 {
+				prev := fmt.Sprintf("node_%d", i-1)
+				edges = append(edges, models.GraphEdge{From: prev, To: id, Weight: 1})
+			}
+		}
+		g := &models.GraphData{Nodes: nodes, Edges: edges, Type: "directed"}
+		return g
+	default:
+		data := make([]interface{}, size)
+		for i := 0; i < size; i++ {
+			data[i] = i // 简单的递增序列
+		}
+		return data
 	}
-	return data
 }
 
 // GetBenchmarkResults 获取测试结果

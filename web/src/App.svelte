@@ -5,6 +5,7 @@
   import BenchmarkPanel from './components/benchmark/BenchmarkPanel.svelte';
   import { selectedAlgorithm } from './stores/algorithm';
   import type { DataType, DataPattern } from './types/data';
+import { generateData as apiGenerateData } from './services/dataService';
 
   // 本地状态
   let inputData: any = null;
@@ -16,13 +17,12 @@
     console.log('Data changed:', inputData);
   }
 
-  function handleDataGenerate(event: CustomEvent<{ dataType: DataType; size: number; pattern: DataPattern }>) {
+  async function handleDataGenerate(event: CustomEvent<{ dataType: DataType; size: number; pattern: DataPattern }>) {
     const { dataType, size, pattern } = event.detail;
     console.log('Generate data:', { dataType, size, pattern });
 
-    // 这里可以调用数据生成API
-    // 暂时生成一些示例数据
     if (dataType === 'array') {
+      // 本地生成数组，保持与算法输入格式一致（纯数组）
       const data = Array.from({ length: size }, (_, i) => {
         switch (pattern) {
           case 'sorted':
@@ -35,6 +35,15 @@
         }
       });
       inputData = data;
+      return;
+    }
+
+    try {
+      const content = await apiGenerateData({ dataType, size, pattern });
+      inputData = content;
+    } catch (e) {
+      console.error('Generate data failed', e);
+      alert('数据生成失败，请重试');
     }
   }
 

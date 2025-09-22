@@ -2,6 +2,7 @@ package services
 
 import (
 	"gin/models"
+	"gin/algorithms"
 	"sync"
 	"time"
 	"crypto/rand"
@@ -31,8 +32,19 @@ func (s *VisualizationService) ExecuteAlgorithmVisualization(algorithmID string,
 		return nil, err
 	}
 
+	// 根据算法类型规范化输入数据
+	var normalized interface{} = data
+	// 如果是图算法，尝试将通用JSON映射转换为GraphData
+	if _, ok := algorithm.(algorithms.GraphAlgorithm); ok {
+		g, err := normalizeGraphData(data)
+		if err != nil {
+			return nil, ErrInvalidInput
+		}
+		normalized = g
+	}
+
 	// 验证输入数据
-	if err := algorithm.ValidateInput(data); err != nil {
+	if err := algorithm.ValidateInput(normalized); err != nil {
 		return nil, ErrInvalidInput
 	}
 
@@ -58,7 +70,7 @@ func (s *VisualizationService) ExecuteAlgorithmVisualization(algorithmID string,
 
 	// 执行算法
 	startTime := time.Now()
-	outputData, err := algorithm.Execute(data, tracker)
+	outputData, err := algorithm.Execute(normalized, tracker)
 	executionTime := time.Since(startTime)
 
 	// 更新会话状态
@@ -82,7 +94,7 @@ func (s *VisualizationService) ExecuteAlgorithmVisualization(algorithmID string,
 	result := &models.VisualizationResult{
 		SessionID:     sessionID,
 		AlgorithmID:   algorithmID,
-		InputData:     data,
+		InputData:     normalized,
 		OutputData:    outputData,
 		Steps:         tracker.GetSteps(),
 		TotalSteps:    len(tracker.GetSteps()),

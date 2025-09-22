@@ -2,6 +2,7 @@ package services
 
 import (
 	"gin/algorithms"
+	"gin/algorithms/graph"
 	"gin/algorithms/searching"
 	"gin/algorithms/sorting"
 	"gin/models"
@@ -39,6 +40,10 @@ func (s *AlgorithmService) registerAlgorithms() {
 	s.registry.Register(searching.NewBinarySearch())
 	s.registry.Register(searching.NewLinearSearch())
 	s.registry.Register(searching.NewHashSearch())
+
+	// 图算法
+	s.registry.Register(graph.NewBFS())
+	s.registry.Register(graph.NewDFS())
 
 	// 可以继续注册更多算法...
 }

@@ -16,7 +16,7 @@
 
   // 响应式语句
   $: availableAlgorithms = $algorithms.filter(alg => 
-    alg.category === 'sorting' || alg.category === 'searching'
+    alg.category === 'sorting' || alg.category === 'searching' || alg.category === 'graph'
   );
 
   // 生命周期
