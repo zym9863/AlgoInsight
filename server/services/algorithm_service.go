@@ -44,6 +44,10 @@ func (s *AlgorithmService) registerAlgorithms() {
 	// 图算法
 	s.registry.Register(graph.NewBFS())
 	s.registry.Register(graph.NewDFS())
+	s.registry.Register(graph.NewDijkstra())
+	s.registry.Register(graph.NewKruskal())
+	s.registry.Register(graph.NewPrim())
+	s.registry.Register(graph.NewTopologicalSort())
 
 	// 可以继续注册更多算法...
 }

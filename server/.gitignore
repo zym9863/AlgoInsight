@@ -1,0 +1,52 @@
+# Go binaries and artifacts
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with 'go test -c'
+*.test
+
+# Output of the go coverage tool
+*.out
+coverage.*
+cover.*
+
+# Build/Distribution folders
+bin/
+build/
+dist/
+
+# Temporary files
+.tmp/
+temp/
+tmp/
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+.env.*
+
+# Editor/IDE settings
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Dependency directories (uncomment if you use vendoring)
+# vendor/
+
+# Tooling (uncomment if generated locally)
+# air.toml
+# .air
+# gin
+# gin.pid
