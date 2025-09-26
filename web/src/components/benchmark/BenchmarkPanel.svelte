@@ -14,6 +14,13 @@
   let isRunning = false;
   let results: any[] = [];
 
+  const idPrefix = `benchmark-${Math.random().toString(36).slice(2)}`;
+  const inputIds = {
+    dataType: `${idPrefix}-data-type`,
+    dataPattern: `${idPrefix}-data-pattern`,
+    testCount: `${idPrefix}-test-count`
+  } as const;
+
   // 响应式语句
   $: availableAlgorithms = $algorithms.filter(alg => 
     alg.category === 'sorting' || alg.category === 'searching' || alg.category === 'graph'
@@ -175,7 +182,7 @@
       
       <!-- 算法选择 -->
       <div class="config-section">
-        <label>选择算法:</label>
+        <span class="section-label">选择算法:</span>
         <div class="algorithm-grid">
           {#each availableAlgorithms as algorithm}
             <label class="algorithm-checkbox">
@@ -193,8 +200,8 @@
 
       <!-- 数据配置 -->
       <div class="config-section">
-        <label>数据类型:</label>
-        <select bind:value={dataType}>
+        <label for={inputIds.dataType}>数据类型:</label>
+        <select id={inputIds.dataType} bind:value={dataType}>
           {#each Object.values(DATA_TYPES) as type}
             <option value={type}>{DATA_TYPE_NAMES[type]}</option>
           {/each}
@@ -202,8 +209,8 @@
       </div>
 
       <div class="config-section">
-        <label>数据模式:</label>
-        <select bind:value={dataPattern}>
+        <label for={inputIds.dataPattern}>数据模式:</label>
+        <select id={inputIds.dataPattern} bind:value={dataPattern}>
           {#each Object.values(DATA_PATTERNS) as pattern}
             <option value={pattern}>{PATTERN_NAMES[pattern]}</option>
           {/each}
@@ -212,7 +219,7 @@
 
       <!-- 数据规模 -->
       <div class="config-section">
-        <label>数据规模:</label>
+        <span class="section-label">数据规模:</span>
         <div class="data-sizes">
           {#each dataSizes as size, index}
             <div class="size-item">
@@ -226,8 +233,14 @@
 
       <!-- 测试次数 -->
       <div class="config-section">
-        <label>测试次数:</label>
-        <input type="number" bind:value={testCount} min="1" max="10" />
+        <label for={inputIds.testCount}>测试次数:</label>
+        <input
+          id={inputIds.testCount}
+          type="number"
+          bind:value={testCount}
+          min="1"
+          max="10"
+        />
       </div>
 
       <!-- 运行按钮 -->
@@ -383,7 +396,8 @@
     margin-bottom: 1rem;
   }
 
-  .config-section label {
+  .config-section label,
+  .config-section .section-label {
     display: block;
     margin-bottom: 0.5rem;
     color: var(--color-text-primary);

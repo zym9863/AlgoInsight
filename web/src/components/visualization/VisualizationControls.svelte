@@ -52,10 +52,13 @@
     visualizationActions.reset();
   }
 
+  /**
+   * 处理进度条点击，按照点击位置跳转到目标步骤。
+   */
   function handleProgressClick(event: MouseEvent) {
     if (!$totalSteps) return;
 
-    const rect = (event.target as HTMLElement).getBoundingClientRect();
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
     const clickX = event.clientX - rect.left;
     const percentage = clickX / rect.width;
     const targetStep = Math.floor(percentage * ($totalSteps - 1));
@@ -65,6 +68,39 @@
 
   function handleSpeedChange() {
     visualizationActions.setSpeed(speedValue);
+  }
+
+  /**
+   * 处理进度条的键盘操作，支持常见的方向键与 Home/End 快捷键。
+   */
+  function handleProgressKey(event: KeyboardEvent) {
+    if (!$totalSteps) {
+      return;
+    }
+
+    let targetStep = $currentStep;
+
+    switch (event.key) {
+      case 'ArrowLeft':
+      case 'ArrowDown':
+        targetStep = Math.max(0, $currentStep - 1);
+        break;
+      case 'ArrowRight':
+      case 'ArrowUp':
+        targetStep = Math.min($totalSteps - 1, $currentStep + 1);
+        break;
+      case 'Home':
+        targetStep = 0;
+        break;
+      case 'End':
+        targetStep = $totalSteps - 1;
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+    visualizationActions.goToStep(targetStep);
   }
 
   // 格式化速度显示
@@ -157,6 +193,7 @@
       <div 
         class="progress-bar"
         on:click={handleProgressClick}
+        on:keydown={handleProgressKey}
         role="slider"
         tabindex="0"
         aria-valuemin="0"

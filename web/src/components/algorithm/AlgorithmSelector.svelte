@@ -264,7 +264,6 @@
 
   .search-input {
     position: relative;
-    group: search;
   }
 
   .search-input input {

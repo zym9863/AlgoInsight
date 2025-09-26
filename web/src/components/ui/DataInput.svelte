@@ -23,6 +23,14 @@
   let generatePattern: DataPattern = DATA_PATTERNS.RANDOM;
   let parseError = '';
 
+  const idPrefix = `data-input-${Math.random().toString(36).slice(2)}`;
+  const inputIds = {
+    dataType: `${idPrefix}-data-type`,
+    customInput: `${idPrefix}-custom-input`,
+    generateSize: `${idPrefix}-generate-size`,
+    generatePattern: `${idPrefix}-generate-pattern`
+  } as const;
+
   // 响应式语句
   $: {
     if (inputMode === 'custom' && customInput) {
@@ -55,6 +63,16 @@
             const num = Number(trimmed);
             return isNaN(num) ? trimmed : num;
           });
+        }
+      } else if (dataType === DATA_TYPES.GRAPH) {
+        // 图数据必须是JSON格式
+        parsed = JSON.parse(customInput);
+        // 基本结构验证
+        if (!parsed.nodes || !Array.isArray(parsed.nodes)) {
+          throw new Error('图数据必须包含nodes数组');
+        }
+        if (!parsed.edges || !Array.isArray(parsed.edges)) {
+          throw new Error('图数据必须包含edges数组');
         }
       } else {
         // 其他数据类型尝试JSON解析
@@ -95,7 +113,7 @@
   // 获取数据预览
   function getDataPreview(data: any): string {
     if (!data) return '无数据';
-    
+
     if (Array.isArray(data)) {
       if (data.length <= 10) {
         return `[${data.join(', ')}]`;
@@ -103,18 +121,101 @@
         return `[${data.slice(0, 5).join(', ')}, ..., ${data.slice(-2).join(', ')}] (${data.length}个元素)`;
       }
     }
-    
+
+    // 图数据的预览
+    if (data && typeof data === 'object' && data.nodes && data.edges) {
+      const nodeCount = data.nodes.length;
+      const edgeCount = data.edges.length;
+      const graphType = data.type === 'directed' ? '有向图' : '无向图';
+      return `${graphType}: ${nodeCount}个节点, ${edgeCount}条边`;
+    }
+
     return JSON.stringify(data).substring(0, 100) + (JSON.stringify(data).length > 100 ? '...' : '');
   }
 
   // 预设数据示例
-  // 增加索引签名，允许用 string 作为 key，解决 TS 报错
-  const presetData: { [key: string]: { name: string; data: number[] }[] } = {
+  const presetData: { [key: string]: { name: string; data: any }[] } = {
     [DATA_TYPES.ARRAY]: [
       { name: '小型随机数组', data: [64, 34, 25, 12, 22, 11, 90, 5, 77, 30] },
       { name: '已排序数组', data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
       { name: '逆序数组', data: [10, 9, 8, 7, 6, 5, 4, 3, 2, 1] },
       { name: '重复元素', data: [5, 2, 8, 2, 9, 1, 5, 5, 2, 8] }
+    ],
+    [DATA_TYPES.GRAPH]: [
+      {
+        name: '简单无向图',
+        data: {
+          type: 'undirected',
+          nodes: [
+            { id: 'A', label: 'A' },
+            { id: 'B', label: 'B' },
+            { id: 'C', label: 'C' },
+            { id: 'D', label: 'D' }
+          ],
+          edges: [
+            { from: 'A', to: 'B' },
+            { from: 'B', to: 'C' },
+            { from: 'C', to: 'D' },
+            { from: 'D', to: 'A' }
+          ]
+        }
+      },
+      {
+        name: '加权有向图',
+        data: {
+          type: 'directed',
+          nodes: [
+            { id: 'start', label: '起点' },
+            { id: 'middle', label: '中间' },
+            { id: 'end', label: '终点' }
+          ],
+          edges: [
+            { from: 'start', to: 'middle', weight: 5 },
+            { from: 'middle', to: 'end', weight: 3 },
+            { from: 'start', to: 'end', weight: 10 }
+          ]
+        }
+      },
+      {
+        name: '小型网络图',
+        data: {
+          type: 'undirected',
+          nodes: [
+            { id: 'node0', label: '节点0' },
+            { id: 'node1', label: '节点1' },
+            { id: 'node2', label: '节点2' },
+            { id: 'node3', label: '节点3' },
+            { id: 'node4', label: '节点4' }
+          ],
+          edges: [
+            { from: 'node0', to: 'node1', weight: 1 },
+            { from: 'node0', to: 'node2', weight: 4 },
+            { from: 'node1', to: 'node2', weight: 2 },
+            { from: 'node1', to: 'node3', weight: 5 },
+            { from: 'node2', to: 'node3', weight: 1 },
+            { from: 'node3', to: 'node4', weight: 3 }
+          ]
+        }
+      },
+      {
+        name: '树结构',
+        data: {
+          type: 'directed',
+          nodes: [
+            { id: 'root', label: '根' },
+            { id: 'left', label: '左子树' },
+            { id: 'right', label: '右子树' },
+            { id: 'leaf1', label: '叶子1' },
+            { id: 'leaf2', label: '叶子2' }
+          ],
+          edges: [
+            { from: 'root', to: 'left' },
+            { from: 'root', to: 'right' },
+            { from: 'left', to: 'leaf1' },
+            { from: 'right', to: 'leaf2' }
+          ]
+        }
+      }
     ]
   };
 </script>
@@ -123,8 +224,8 @@
   <div class="header">
     <h4>数据输入</h4>
     <div class="data-type-selector">
-      <label>数据类型:</label>
-      <select bind:value={dataType}>
+      <label for={inputIds.dataType}>数据类型:</label>
+      <select id={inputIds.dataType} bind:value={dataType}>
         {#each Object.values(DATA_TYPES) as type}
           <option value={type}>{DATA_TYPE_NAMES[type]}</option>
         {/each}
@@ -166,19 +267,28 @@
   <!-- 自定义输入 -->
   {#if inputMode === 'custom' && allowCustomInput}
     <div class="custom-input">
-      <label>
+      <label for={inputIds.customInput}>
         {#if dataType === DATA_TYPES.ARRAY}
           输入数组 (支持JSON格式或逗号分隔):
+        {:else if dataType === DATA_TYPES.GRAPH}
+          输入图数据 (JSON格式):
         {:else}
           输入JSON格式数据:
         {/if}
       </label>
       <textarea
+        id={inputIds.customInput}
         bind:value={customInput}
-        placeholder={dataType === DATA_TYPES.ARRAY 
-          ? "例如: [1, 2, 3, 4, 5] 或 1, 2, 3, 4, 5" 
+        placeholder={dataType === DATA_TYPES.ARRAY
+          ? "例如: [1, 2, 3, 4, 5] 或 1, 2, 3, 4, 5"
+          : dataType === DATA_TYPES.GRAPH
+          ? `例如: {
+  "type": "directed",
+  "nodes": [{"id": "A", "label": "A"}, {"id": "B", "label": "B"}],
+  "edges": [{"from": "A", "to": "B", "weight": 1}]
+}`
           : "输入JSON格式数据"}
-        rows="4"
+        rows={dataType === DATA_TYPES.GRAPH ? 8 : 4}
       ></textarea>
       
       {#if parseError}
@@ -192,8 +302,9 @@
     <div class="generate-data">
       <div class="generate-controls">
         <div class="control-group">
-          <label>数据大小:</label>
+          <label for={inputIds.generateSize}>数据大小:</label>
           <input
+            id={inputIds.generateSize}
             type="number"
             bind:value={generateSize}
             min="1"
@@ -202,8 +313,8 @@
         </div>
         
         <div class="control-group">
-          <label>数据模式:</label>
-          <select bind:value={generatePattern}>
+          <label for={inputIds.generatePattern}>数据模式:</label>
+          <select id={inputIds.generatePattern} bind:value={generatePattern}>
             {#each Object.values(DATA_PATTERNS) as pattern}
               <option value={pattern}>{PATTERN_NAMES[pattern]}</option>
             {/each}

@@ -362,7 +362,7 @@ import { generateData as apiGenerateData } from './services/dataService';
   }
 
   /* 平滑滚动 */
-  html {
+  :global(html) {
     scroll-behavior: smooth;
   }
 
@@ -378,16 +378,16 @@ import { generateData as apiGenerateData } from './services/dataService';
     }
   }
 
-  .left-panel > *,
-  .right-panel > * {
+  :global(.left-panel > *),
+  :global(.right-panel > *) {
     animation: fadeInUp 0.6s ease-out;
   }
 
-  .left-panel > *:nth-child(2) {
+  :global(.left-panel > *:nth-child(2)) {
     animation-delay: 0.1s;
   }
 
-  .left-panel > *:nth-child(3) {
+  :global(.left-panel > *:nth-child(3)) {
     animation-delay: 0.2s;
   }
 </style>

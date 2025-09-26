@@ -182,54 +182,234 @@
   // 绘制图可视化
   function drawGraphVisualization(step: VisualizationStep) {
     const data = step.data as any;
-    const nodes = data.nodes as Array<{ id: string; label: string; x?: number; y?: number }>;
-    const edges = data.edges as Array<{ from: string; to: string }>;
+    const nodes = data.nodes as Array<{ id: string; label: string; x?: number; y?: number; value?: any }>;
+    const edges = data.edges as Array<{ from: string; to: string; weight?: any; label?: string }>;
 
-    // 计算布局（如果没有坐标，生成圆形布局）
-    const cx = width / 2;
-    const cy = height / 2;
-    const radius = Math.min(width, height) * 0.35;
+    // 使用力导向布局计算节点位置
+    const positions = calculateForceDirectedLayout(nodes, edges);
 
-    const positions: Record<string, { x: number; y: number }> = {};
-    nodes.forEach((n, i) => {
-      const angle = (2 * Math.PI * i) / nodes.length;
-      const x = typeof n.x === 'number' ? n.x : cx + radius * Math.cos(angle);
-      const y = typeof n.y === 'number' ? n.y : cy + radius * Math.sin(angle);
-      positions[n.id] = { x, y };
-    });
-
-    // 清空并绘制边
+    // 绘制边
     ctx.strokeStyle = $visualizationTheme.borderColor;
     ctx.lineWidth = 1.5;
-    edges.forEach(e => {
+    ctx.font = '12px Arial';
+
+    edges.forEach((e, edgeIndex) => {
       const p1 = positions[e.from];
       const p2 = positions[e.to];
       if (!p1 || !p2) return;
+
+      // 检查边是否被高亮
+      const highlighted = step.highlights && step.highlights.includes(`edge_${edgeIndex}`);
+      ctx.strokeStyle = highlighted ? $visualizationTheme.highlightColor : $visualizationTheme.borderColor;
+
+      // 绘制边
       ctx.beginPath();
       ctx.moveTo(p1.x, p1.y);
       ctx.lineTo(p2.x, p2.y);
       ctx.stroke();
+
+      // 如果是有向图，绘制箭头
+      if (data.type === 'directed') {
+        drawArrow(p1.x, p1.y, p2.x, p2.y, 16);
+      }
+
+      // 显示权重
+      if (e.weight !== undefined && e.weight !== null) {
+        const midX = (p1.x + p2.x) / 2;
+        const midY = (p1.y + p2.y) / 2;
+
+        // 绘制权重背景
+        const weightText = e.weight.toString();
+        const textMetrics = ctx.measureText(weightText);
+        const padding = 4;
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.fillRect(
+          midX - textMetrics.width / 2 - padding,
+          midY - 6 - padding,
+          textMetrics.width + padding * 2,
+          12 + padding * 2
+        );
+
+        // 绘制权重文本
+        ctx.fillStyle = $visualizationTheme.textColor;
+        ctx.textAlign = 'center';
+        ctx.fillText(weightText, midX, midY + 4);
+      }
     });
 
     // 绘制节点
     nodes.forEach((n, i) => {
       const pos = positions[n.id];
       if (!pos) return;
-      const r = 16;
+
+      const radius = 20;
       const highlighted = step.highlights && step.highlights.includes(i);
-      ctx.fillStyle = highlighted ? $visualizationTheme.highlightColor : $visualizationTheme.primaryColor;
+
+      // 检查节点是否在比较操作中
+      let nodeColor = $visualizationTheme.primaryColor;
+      if (highlighted) {
+        nodeColor = $visualizationTheme.highlightColor;
+      } else if (step.comparisons) {
+        for (const comparison of step.comparisons) {
+          if (comparison.index1 === i || comparison.index2 === i) {
+            nodeColor = $visualizationTheme.compareColor;
+            break;
+          }
+        }
+      }
+
+      // 绘制节点圆圈
+      ctx.fillStyle = nodeColor;
       ctx.beginPath();
-      ctx.arc(pos.x, pos.y, r, 0, 2 * Math.PI);
+      ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI);
       ctx.fill();
+
+      // 绘制节点边框
       ctx.strokeStyle = $visualizationTheme.borderColor;
+      ctx.lineWidth = 2;
       ctx.stroke();
 
-      // 标签
-      ctx.fillStyle = $visualizationTheme.textColor;
-      ctx.font = '12px Arial';
+      // 绘制节点标签
+      ctx.fillStyle = 'white';
+      ctx.font = 'bold 12px Arial';
       ctx.textAlign = 'center';
-      ctx.fillText(n.label ?? n.id, pos.x, pos.y - r - 4);
+      ctx.fillText(n.label || n.id, pos.x, pos.y + 4);
+
+      // 在节点下方显示值（如果有）
+      if (n.value !== undefined && n.value !== null) {
+        ctx.fillStyle = $visualizationTheme.textColor;
+        ctx.font = '10px Arial';
+        ctx.fillText(`(${n.value})`, pos.x, pos.y + radius + 15);
+      }
     });
+  }
+
+  // 力导向布局算法
+  function calculateForceDirectedLayout(nodes: any[], edges: any[]): Record<string, { x: number; y: number }> {
+    const positions: Record<string, { x: number; y: number }> = {};
+    const velocities: Record<string, { vx: number; vy: number }> = {};
+
+    // 初始化位置（圆形排列）
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const radius = Math.min(width, height) * 0.3;
+
+    nodes.forEach((node, i) => {
+      if (typeof node.x === 'number' && typeof node.y === 'number') {
+        // 如果节点已有坐标，使用现有坐标
+        positions[node.id] = { x: node.x, y: node.y };
+      } else {
+        // 否则使用圆形布局
+        const angle = (2 * Math.PI * i) / nodes.length;
+        positions[node.id] = {
+          x: centerX + radius * Math.cos(angle),
+          y: centerY + radius * Math.sin(angle)
+        };
+      }
+      velocities[node.id] = { vx: 0, vy: 0 };
+    });
+
+    // 力导向布局参数
+    const k = Math.sqrt((width * height) / nodes.length);
+    const iterations = 50;
+    const cooling = 0.99;
+    let temperature = width / 10;
+
+    // 迭代计算
+    for (let iter = 0; iter < iterations; iter++) {
+      // 计算排斥力
+      nodes.forEach(nodeA => {
+        velocities[nodeA.id] = { vx: 0, vy: 0 };
+
+        nodes.forEach(nodeB => {
+          if (nodeA.id !== nodeB.id) {
+            const dx = positions[nodeA.id].x - positions[nodeB.id].x;
+            const dy = positions[nodeA.id].y - positions[nodeB.id].y;
+            const distance = Math.sqrt(dx * dx + dy * dy) || 1;
+
+            if (distance < k * 2) {
+              const repulsiveForce = k * k / distance;
+              velocities[nodeA.id].vx += (dx / distance) * repulsiveForce;
+              velocities[nodeA.id].vy += (dy / distance) * repulsiveForce;
+            }
+          }
+        });
+      });
+
+      // 计算吸引力（基于边连接）
+      edges.forEach(edge => {
+        const dx = positions[edge.to].x - positions[edge.from].x;
+        const dy = positions[edge.to].y - positions[edge.from].y;
+        const distance = Math.sqrt(dx * dx + dy * dy) || 1;
+
+        const attractiveForce = distance * distance / k;
+        const fx = (dx / distance) * attractiveForce;
+        const fy = (dy / distance) * attractiveForce;
+
+        velocities[edge.from].vx += fx;
+        velocities[edge.from].vy += fy;
+        velocities[edge.to].vx -= fx;
+        velocities[edge.to].vy -= fy;
+      });
+
+      // 更新位置
+      nodes.forEach(node => {
+        const v = velocities[node.id];
+        const speed = Math.sqrt(v.vx * v.vx + v.vy * v.vy);
+
+        if (speed > temperature) {
+          v.vx = (v.vx / speed) * temperature;
+          v.vy = (v.vy / speed) * temperature;
+        }
+
+        positions[node.id].x += v.vx;
+        positions[node.id].y += v.vy;
+
+        // 边界约束
+        const margin = 50;
+        positions[node.id].x = Math.max(margin, Math.min(width - margin, positions[node.id].x));
+        positions[node.id].y = Math.max(margin, Math.min(height - margin, positions[node.id].y));
+      });
+
+      temperature *= cooling;
+    }
+
+    return positions;
+  }
+
+  // 绘制箭头
+  function drawArrow(fromX: number, fromY: number, toX: number, toY: number, nodeRadius: number) {
+    const dx = toX - fromX;
+    const dy = toY - fromY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance === 0) return;
+
+    // 计算箭头起点（避开节点圆圈）
+    const unitX = dx / distance;
+    const unitY = dy / distance;
+    const endX = toX - unitX * nodeRadius;
+    const endY = toY - unitY * nodeRadius;
+
+    // 箭头参数
+    const arrowLength = 12;
+    const arrowAngle = Math.PI / 6;
+
+    // 计算箭头两个边的端点
+    const angle = Math.atan2(dy, dx);
+    const arrowX1 = endX - arrowLength * Math.cos(angle - arrowAngle);
+    const arrowY1 = endY - arrowLength * Math.sin(angle - arrowAngle);
+    const arrowX2 = endX - arrowLength * Math.cos(angle + arrowAngle);
+    const arrowY2 = endY - arrowLength * Math.sin(angle + arrowAngle);
+
+    // 绘制箭头
+    ctx.beginPath();
+    ctx.moveTo(endX, endY);
+    ctx.lineTo(arrowX1, arrowY1);
+    ctx.moveTo(endX, endY);
+    ctx.lineTo(arrowX2, arrowY2);
+    ctx.stroke();
   }
 
   // 绘制通用可视化

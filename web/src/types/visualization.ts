@@ -4,7 +4,7 @@ export interface VisualizationStep {
   stepId: number;
   description: string;
   data: any;
-  highlights: number[];
+  highlights: Array<number | string>;
   comparisons: Comparison[];
   operations: Operation[];
   metadata: StepMetadata;
