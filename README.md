@@ -155,8 +155,6 @@ AlgoInsight/
 
 ## 🎯 支持的算法
 
-> 下列列表基于当前代码库实际实现（`server/algorithms`）。README 早期占位的 Dijkstra / Kruskal 尚未落地，避免误导已临时移除，可在 Roadmap 中查看计划。
-
 ### 排序算法
 - 冒泡排序 (Bubble Sort)
 - 快速排序 (Quick Sort)
@@ -174,6 +172,10 @@ AlgoInsight/
 ### 图算法
 - 广度优先搜索 (BFS)
 - 深度优先搜索 (DFS)
+- 最短路径算法 (Dijkstra)
+- 最小生成树算法 (Kruskal)
+- 最小生成树算法 (Prim)
+- 拓扑排序 (Topological Sort)
 
 ## 🧪 本地 API 快速测试
 
@@ -230,7 +232,7 @@ docker-compose up -d
 
 ## 🧭 Roadmap
 
-- [ ] 增加图算法：Dijkstra、Kruskal、Prim、Topological Sort
+- [x] 增加图算法：Dijkstra、Kruskal、Prim、Topological Sort
 - [ ] 增加更多性能指标：内存峰值、GC 次数
 - [ ] 前端：步骤滑块快速跳转 / 断点标记
 - [ ] 算法步骤导出（JSON / GIF / 视频）

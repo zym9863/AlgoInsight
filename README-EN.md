@@ -156,8 +156,6 @@ AlgoInsight/
 
 ## 🎯 Supported Algorithms
 
-> List reflects current implementation in `server/algorithms`. Earlier placeholders (Dijkstra, Kruskal) are not yet implemented and moved to Roadmap to avoid confusion.
-
 ### Sorting Algorithms
 - Bubble Sort
 - Quick Sort
@@ -175,6 +173,10 @@ AlgoInsight/
 ### Graph Algorithms
 - Breadth-First Search (BFS)
 - Depth-First Search (DFS)
+- Shortest Path Algorithm (Dijkstra)
+- Minimum Spanning Tree (Kruskal)
+- Minimum Spanning Tree (Prim)
+- Topological Sort
 
 ## 🧪 Local API Quick Test
 
@@ -231,7 +233,7 @@ docker-compose up -d
 
 ## 🧭 Roadmap
 
-- [ ] Graph algorithms: Dijkstra, Kruskal, Prim, Topological Sort
+- [x] Graph algorithms: Dijkstra, Kruskal, Prim, Topological Sort
 - [ ] More metrics: peak memory, GC stats
 - [ ] Frontend: step slider & breakpoint markers
 - [ ] Export steps (JSON / GIF / Video)
